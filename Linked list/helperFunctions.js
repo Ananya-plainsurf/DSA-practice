@@ -1,5 +1,3 @@
-// helperFunctions.js
-
 /**
  * Definition for singly-linked list.
  */
@@ -72,4 +70,43 @@ export function createLinkedListWithCycle(arr = [], pos = -1) {
   if (pos >= 0 && cycleNode) current.next = cycleNode;
 
   return head;
+}
+
+/**
+ * Creates two linked lists that intersect at a given node.
+ * @param {number[]} listA - Array of values for list A.
+ * @param {number[]} listB - Array of values for list B.
+ * @param {number} skipA - Number of nodes to skip in list A before intersection.
+ * @param {number} skipB - Number of nodes to skip in list B before intersection.
+ * @returns {{ headA: ListNode, headB: ListNode, intersection: ListNode|null }}
+ */
+export function createIntersectingLinkedLists(
+  listA = [],
+  listB = [],
+  skipA = 0,
+  skipB = 0
+) {
+  const headA = createLinkedList(listA);
+  const headB = createLinkedList(listB);
+
+  if (!headA || !headB || skipA >= listA.length || skipB >= listB.length) {
+    return { headA, headB, intersection: null };
+  }
+
+  // Find the intersection node in A
+  let intersection = headA;
+  for (let i = 0; i < skipA; i++) {
+    intersection = intersection.next;
+  }
+
+  // Move through B until the position before intersection
+  let currentB = headB;
+  for (let i = 0; i < skipB - 1; i++) {
+    currentB = currentB.next;
+  }
+
+  // Connect B’s next pointer to the intersection node
+  if (currentB) currentB.next = intersection;
+
+  return { headA, headB, intersection };
 }

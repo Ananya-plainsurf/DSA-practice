@@ -7,6 +7,7 @@ var hasCycle = function (head) {
   const seen = new Map();
   while (head && head.next !== null) {
     if (seen.has(head)) {
+      console.log({ seen, head });
       return true;
     }
     seen.set(head, 1);
