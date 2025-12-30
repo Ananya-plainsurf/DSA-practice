@@ -1,4 +1,4 @@
-// perform the stack operations
+// perform the stack operations using linked list
 // peek(), push(), pop(), lookup()
 
 class Node {
