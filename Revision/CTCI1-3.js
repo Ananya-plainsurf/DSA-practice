@@ -14,7 +14,6 @@ function urlify(str, trueLength) {
   let strArr = [...str];
   while (i < trueLength) {
     const ch = strArr[i];
-    console.log({ ch, i, strArr });
     if (ch.charCodeAt(0) === 32) {
       strArr[i] = "%";
       strArr[i + 1] = "20";
