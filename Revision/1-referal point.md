@@ -14,6 +14,7 @@
 
 - Arrays
 - Array + Hashing
+- Sliding window
 
 ---
 
