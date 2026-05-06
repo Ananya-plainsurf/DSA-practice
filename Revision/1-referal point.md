@@ -6,7 +6,8 @@
 
 ## And inside each topic:
 
-- 4 Easy → 3 Medium → 2 Hard
+- 4 Easy → 3 Medium → 2 Hard (hard will solve later)
+- from now 6-5-26 4 easy -> 4 medium
 
 # 🚀 DSA Plan (Revision + Next Topics)
 
@@ -15,6 +16,7 @@
 - Arrays
 - Array + Hashing
 - Sliding window
+- linked list
 
 ---
 
