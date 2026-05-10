@@ -17,6 +17,7 @@
 - Array + Hashing
 - Sliding window
 - linked list
+- stack (4 easy, 3 medium)
 
 ---
 
