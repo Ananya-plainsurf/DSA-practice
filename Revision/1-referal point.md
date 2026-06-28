@@ -201,3 +201,93 @@ Core patterns:
 - Build consistency over speed
 - Visual intuition first → coding second
 - Learn patterns, not endless problems
+
+learning recursion -> tree -> graph -> DP problems first
+
+1. Recursion Foundations
+
+Learn:
+
+Base case
+Recursive tree visualization
+Backtracking basics
+Include/exclude pattern
+Pick/not-pick pattern
+
+Problems:
+
+Factorial
+Fibonacci
+Generate subsets
+Permutations
+Combination Sum
+N-Queens (later) 2. Trees
+
+Trees are essentially recursion applied to a data structure.
+
+You'll naturally use:
+
+DFS(node):
+process(node)
+DFS(node.left)
+DFS(node.right)
+
+Topics:
+
+Traversals
+Height / Depth
+Diameter
+LCA
+BST basics
+
+This reinforces recursion heavily.
+
+3. Graphs
+
+Graphs extend the same ideas:
+
+DFS = recursive thinking
+BFS = queue thinking
+
+You'll see familiar patterns:
+
+Tree DFS
+↓
+Graph DFS
+
+Topics:
+
+DFS
+BFS
+Connected Components
+Number of Islands
+Topological Sort
+Shortest Path basics 4. Dynamic Programming
+
+This is where recursion pays off.
+
+Most DP problems start as:
+
+Step 1: Recursive solution
+Step 2: Memoization
+Step 3: Tabulation
+
+For example:
+
+Fibonacci
+
+Recursion:
+
+f(n) = f(n-1) + f(n-2)
+
+Then DP:
+
+memo[n]
+
+Then Tabulation.
+
+Without recursion, DP often feels like memorizing formulas.
+
+With recursion, DP feels like:
+
+"I'm just caching repeated recursive work."
