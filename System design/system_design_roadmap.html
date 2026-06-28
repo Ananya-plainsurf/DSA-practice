@@ -1,0 +1,172 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0; }
+  .phase { margin-bottom: 2rem; }
+  .phase-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:0.5px solid var(--color-border-tertiary); }
+  .phase-badge { font-size:11px; font-weight:500; padding:3px 10px; border-radius:20px; }
+  .ph-1 { background:var(--color-background-info); color:var(--color-text-info); }
+  .ph-2 { background:var(--color-background-success); color:var(--color-text-success); }
+  .ph-3 { background:var(--color-background-warning); color:var(--color-text-warning); }
+  .ph-4 { background:var(--color-background-danger); color:var(--color-text-danger); }
+  .phase-title { font-size:16px; font-weight:500; color:var(--color-text-primary); }
+  .phase-sub { font-size:12px; color:var(--color-text-secondary); margin-left:auto; }
+  .topics { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; }
+  .topic-card { background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-lg); padding:12px 14px; cursor:pointer; transition:border-color .15s, background .15s; }
+  .topic-card:hover { border-color:var(--color-border-secondary); background:var(--color-background-secondary); }
+  .topic-card.done { border-left:3px solid var(--color-border-success); }
+  .topic-card.active { border-left:3px solid var(--color-border-info); }
+  .topic-name { font-size:14px; font-weight:500; color:var(--color-text-primary); margin-bottom:4px; }
+  .topic-status { font-size:11px; color:var(--color-text-secondary); }
+  .questions-panel { margin-top:1.5rem; background:var(--color-background-secondary); border-radius:var(--border-radius-lg); border:0.5px solid var(--color-border-tertiary); padding:16px 18px; display:none; }
+  .questions-panel.open { display:block; }
+  .q-title { font-size:14px; font-weight:500; color:var(--color-text-primary); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .q-close { margin-left:auto; font-size:12px; color:var(--color-text-secondary); cursor:pointer; background:none; border:none; font-family:inherit; }
+  .q-list { list-style:none; }
+  .q-list li { font-size:13px; color:var(--color-text-secondary); padding:6px 0; border-bottom:0.5px solid var(--color-border-tertiary); display:flex; gap:8px; align-items:flex-start; line-height:1.5; }
+  .q-list li:last-child { border-bottom:none; }
+  .q-list li::before { content:"→"; color:var(--color-text-info); flex-shrink:0; margin-top:1px; }
+  .ask-btn { margin-top:10px; font-size:12px; background:none; border:0.5px solid var(--color-border-secondary); border-radius:var(--border-radius-md); padding:5px 12px; cursor:pointer; color:var(--color-text-secondary); font-family:inherit; transition:background .15s; }
+  .ask-btn:hover { background:var(--color-background-primary); }
+  .legend { display:flex; gap:16px; margin-bottom:1.5rem; font-size:12px; color:var(--color-text-secondary); flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; }
+  .legend-dot { width:10px; height:10px; border-radius:2px; }
+  .ld-done { background:var(--color-background-success); border:0.5px solid var(--color-border-success); }
+  .ld-active { background:var(--color-background-info); border:0.5px solid var(--color-border-info); }
+  .ld-todo { background:var(--color-background-secondary); border:0.5px solid var(--color-border-tertiary); }
+</style>
+
+<h2 class="sr-only">System design self-study roadmap with questions per topic</h2>
+
+<div style="padding:1rem 0 0">
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot ld-done"></span>Already covered</span>
+    <span class="legend-item"><span class="legend-dot ld-active"></span>Fill gaps next</span>
+    <span class="legend-item"><span class="legend-dot ld-todo"></span>Later phase</span>
+  </div>
+
+  <div id="questions-panel" class="questions-panel">
+    <div class="q-title">
+      <span id="q-topic-name"></span>
+      <button class="q-close" onclick="closePanel()">✕ close</button>
+    </div>
+    <ul class="q-list" id="q-list"></ul>
+    <button class="ask-btn" id="ask-btn" onclick="askClaude()">Ask Claude to explain this ↗</button>
+  </div>
+
+  <div id="phases-container"></div>
+</div>
+
+<script>
+const data = [
+  {
+    id:1, label:"Phase 1", title:"Foundations", badge:"ph-1", status:"done",
+    note:"You've covered all of this",
+    topics:[
+      { name:"Client-server architecture", status:"done", qs:["How does a browser know which server to contact?","What happens between typing a URL and seeing a page?","What is the difference between a client and a server in terms of responsibility?","When does client-server break down as a model?"] },
+      { name:"HTTP / HTTPS", status:"done", qs:["What is the difference between HTTP/1.1, HTTP/2, and HTTP/3?","How does TLS actually work at a high level?","What is the difference between a 301 and a 302 redirect?","Why does HTTP/2 multiplexing help performance?","What does idempotent mean in HTTP context?"] },
+      { name:"DNS", status:"done", qs:["What is the full resolution chain from browser to IP?","What is the difference between authoritative and recursive DNS?","What is DNS TTL and why does it matter for deployments?","How can DNS be used as part of load balancing?"] },
+      { name:"APIs & REST", status:"done", qs:["What makes an API truly RESTful?","What is the difference between REST and RPC?","When should you version an API and how?","What does stateless mean in REST and why does it matter for scaling?","What is HATEOAS and does it matter in practice?"] },
+      { name:"GraphQL", status:"done", qs:["What problem does GraphQL solve that REST doesn't?","What are the downsides of GraphQL over REST?","What is the N+1 problem in GraphQL and how do you solve it?","When would you choose GraphQL vs REST?"] },
+    ]
+  },
+  {
+    id:2, label:"Phase 2", title:"Core scaling concepts", badge:"ph-2", status:"done",
+    note:"Covered — deepen the tradeoffs",
+    topics:[
+      { name:"Databases", status:"done", qs:["What is the difference between ACID and BASE?","When would you pick NoSQL over SQL?","What is an index and what are the tradeoffs of adding one?","What is a write-ahead log (WAL)?","How does a B-tree index work conceptually?"] },
+      { name:"Caching", status:"done", qs:["What is cache invalidation and why is it hard?","What is the difference between write-through, write-back, and write-around?","What is a cache stampede and how do you prevent it?","Where should a cache sit — client, CDN, app, or DB layer?","What is the difference between LRU and LFU eviction?"] },
+      { name:"Load balancers", status:"done", qs:["What is the difference between L4 and L7 load balancing?","What is round-robin vs least-connections vs IP-hash?","How does a load balancer know a server is unhealthy?","What is sticky session and when do you need it?","What happens to in-flight requests when a server is removed?"] },
+      { name:"Vertical scaling", status:"done", qs:["What is the ceiling of vertical scaling and why does it exist?","What does scaling up look like for databases specifically?","When is vertical scaling the right first move?"] },
+      { name:"Horizontal scaling", status:"done", qs:["What architectural changes are needed to go from 1 to N servers?","What is the challenge of session state in horizontal scaling?","What does stateless mean for horizontal scalability?","How do you handle file uploads when you have N app servers?"] },
+    ]
+  },
+  {
+    id:3, label:"Phase 3", title:"Distribution & gaps", badge:"ph-3", status:"active",
+    note:"Fill these gaps — most interview-relevant",
+    topics:[
+      { name:"Replication", status:"done", qs:["What is the difference between synchronous and asynchronous replication?","What is replication lag and what problems does it cause?","What is the difference between primary-replica and multi-primary?","What is eventual consistency and when is it acceptable?","How does leader election work after a primary fails?"] },
+      { name:"Sharding", status:"done", qs:["What is the difference between range-based and hash-based sharding?","What is a hot shard and how do you fix it?","What new problems does sharding introduce that didn't exist before?","How do you handle cross-shard queries?","What is consistent hashing and why does it help re-sharding?"] },
+      { name:"CAP theorem", status:"done", qs:["Can you give a concrete example of choosing CP vs AP?","What does partition tolerance actually mean in practice?","Why can't you truly sacrifice P in a distributed system?","What is PACELC and how does it extend CAP?"] },
+      { name:"Proxy / reverse proxy", status:"active", qs:["What is the difference between a forward and reverse proxy?","What can a reverse proxy do that a load balancer cannot?","How does Nginx sit in front of an app server?","What is SSL termination and why is it done at the proxy?","How does a proxy help with DDoS mitigation?"] },
+      { name:"Database indexing", status:"active", qs:["What is the difference between a clustered and non-clustered index?","What is a composite index and how do column order matters?","What is an index scan vs an index seek?","How does adding an index affect write performance?","What is a covering index?"] },
+      { name:"Vertical partitioning", status:"active", qs:["What is the difference between vertical partitioning and normalisation?","When would you vertically partition a table?","What is the tradeoff of splitting a wide table?","How is vertical partitioning different from sharding?"] },
+      { name:"CDN", status:"done", qs:["What is the difference between push and pull CDN?","What types of content should NOT go on a CDN?","How does a CDN handle cache invalidation?","How does a CDN help with TTFB?","What is edge computing and how does it extend the CDN model?"] },
+      { name:"Message queues", status:"done", qs:["What is the difference between a message queue and a pub/sub system?","What is at-least-once vs exactly-once delivery?","What is a dead letter queue?","Why does async messaging help with spiky traffic?","What is backpressure and how do queues handle it?"] },
+      { name:"Rate limiting", status:"active", qs:["What are the main rate limiting algorithms (token bucket, leaky bucket, fixed window, sliding window)?","Where should rate limiting live — client, gateway, or service?","How do you rate limit across multiple instances?","What is the difference between rate limiting and throttling?","How do you prevent a single bad actor from affecting others?"] },
+      { name:"WebSockets", status:"active", qs:["What is the full WebSocket handshake process?","Why can't HTTP polling replace WebSockets for real-time apps?","What is the difference between WebSockets and SSE?","How do you scale a WebSocket server horizontally?","What happens to WebSocket connections during a deployment?"] },
+      { name:"API gateways", status:"active", qs:["What is the difference between an API gateway and a reverse proxy?","What cross-cutting concerns does an API gateway handle?","How does an API gateway help with microservices routing?","What is the BFF (backend for frontend) pattern?","What are the downsides of centralising all traffic through a gateway?"] },
+    ]
+  },
+  {
+    id:4, label:"Phase 4", title:"Architecture & design practice", badge:"ph-4", status:"todo",
+    note:"After Phase 3 — interview-ready thinking",
+    topics:[
+      { name:"Microservices", status:"todo", qs:["What problems do microservices solve that a monolith cannot?","What is service discovery and why do you need it?","What is the saga pattern for distributed transactions?","What is circuit breaking and why does it matter?","When is a monolith actually the better choice?"] },
+      { name:"Blob / object storage", status:"todo", qs:["What is the difference between block, file, and object storage?","How does S3 store and retrieve an object internally?","How do you design a large file upload flow?","What is a presigned URL and when do you use it?"] },
+      { name:"Idempotency", status:"todo", qs:["Why is idempotency critical for payment systems?","How do you implement idempotency keys?","What is the difference between idempotent and non-idempotent HTTP methods?","What problems arise in retries without idempotency?"] },
+      { name:"Webhooks", status:"todo", qs:["What is the difference between webhooks and polling?","How do you make webhook delivery reliable?","How do you secure a webhook endpoint?","What is the fan-out problem in webhooks?"] },
+      { name:"Design: URL shortener", status:"todo", qs:["What is the core data model?","How do you generate short codes without collisions?","How would you scale this to 1 billion URLs?","Where does caching help most here?","How do you handle analytics per short URL?"] },
+      { name:"Design: WhatsApp / chat", status:"todo", qs:["How do you deliver messages to offline users?","Why are WebSockets better than polling here?","How do you store message history at scale?","What is end-to-end encryption and how does it affect server design?","How do you scale presence (online/offline) indicators?"] },
+      { name:"Design: YouTube / Netflix", status:"todo", qs:["How does video upload and transcoding work?","Why is a CDN essential for video streaming?","What is adaptive bitrate streaming?","How do you design the recommendation feed?","How do you handle storage costs at scale?"] },
+      { name:"Design: Twitter / X feed", status:"todo", qs:["What is the fanout-on-write vs fanout-on-read tradeoff?","How do you handle celebrities with 50M followers differently?","How do you design trending topics?","What is the timeline generation problem?","How would you shard the tweets table?"] },
+    ]
+  }
+];
+
+let currentTopic = null;
+
+function renderPhases() {
+  const container = document.getElementById('phases-container');
+  data.forEach(phase => {
+    const div = document.createElement('div');
+    div.className = 'phase';
+    div.innerHTML = `
+      <div class="phase-header">
+        <span class="phase-badge ${phase.badge}">${phase.label}</span>
+        <span class="phase-title">${phase.title}</span>
+        <span class="phase-sub">${phase.note}</span>
+      </div>
+      <div class="topics">
+        ${phase.topics.map(t => `
+          <div class="topic-card ${t.status}" onclick="showQuestions('${encodeURIComponent(t.name)}')">
+            <div class="topic-name">${t.name}</div>
+            <div class="topic-status">${t.status === 'done' ? '✓ covered' : t.status === 'active' ? '→ fill gap' : '○ later'} · ${t.qs.length} questions</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function showQuestions(encodedName) {
+  const name = decodeURIComponent(encodedName);
+  let topic = null;
+  for (const phase of data) {
+    topic = phase.topics.find(t => t.name === name);
+    if (topic) break;
+  }
+  if (!topic) return;
+  currentTopic = topic;
+  const panel = document.getElementById('questions-panel');
+  document.getElementById('q-topic-name').textContent = topic.name;
+  const list = document.getElementById('q-list');
+  list.innerHTML = topic.qs.map(q => `<li>${q}</li>`).join('');
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function closePanel() {
+  document.getElementById('questions-panel').classList.remove('open');
+  currentTopic = null;
+}
+
+function askClaude() {
+  if (!currentTopic) return;
+  sendPrompt(`Explain "${currentTopic.name}" in depth for system design interviews — cover what it is, why it exists, the main tradeoffs, and what problems it introduces. Use concrete examples.`);
+}
+
+renderPhases();
+</script>
