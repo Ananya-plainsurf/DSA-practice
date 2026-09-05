@@ -1,68 +1,52 @@
-// Number of island
-function outer(grid) {
-  // const visited = new Set();
-  let island = 0;
-  const col = grid[0].length;
-  const rows = grid.length;
-  function dfs(r, c) {
-    if (
-      r < 0 ||
-      c < 0 ||
-      r >= rows ||
-      c >= col ||
-      //   visited.has(`${r},${c}`) ||
-      grid[r][c] === "0"
-    ) {
-      return;
+// Interval List Intersection
+
+function IntersectionList(listA, listB) {
+  let i = 0;
+  let j = 0;
+  const result = [];
+  while (i < listA.length && j < listB.length) {
+    const a = listA[i];
+    const b = listB[j];
+
+    const start = Math.max(a[0], b[0]);
+    const end = Math.min(a[1], b[1]);
+
+    if (start <= end) {
+      result.push([start, end]);
     }
 
-    // visited.add(`${r},${c}`);
-    grid[r][c] = "0";
-
-    dfs(r + 1, c);
-    dfs(r - 1, c);
-    dfs(r, c - 1);
-    dfs(r, c + 1);
-  }
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < col; c++) {
-      if (
-        grid[r][c] === "1"
-        // && !visited.has(`${r},${c}`)
-      ) {
-        island++;
-        dfs(r, c);
-      }
+    if (a[1] < b[1]) {
+      i++;
+    } else {
+      j++;
     }
   }
-
-  return island;
+  return result;
 }
 
 console.log(
-  outer([
-    ["1", "1", "0"],
-    ["1", "1", "0"],
-    ["1", "1", "0"],
-    ["0", "0", "1"],
-  ]),
+  IntersectionList(
+    [
+      [0, 2],
+      [5, 10],
+      [13, 23],
+      [24, 25],
+    ],
+    [
+      [1, 5],
+      [8, 12],
+      [15, 24],
+      [25, 26],
+    ],
+  ),
 );
 
 console.log(
-  outer([
-    ["1", "1", "1", "1", "0"],
-    ["1", "1", "0", "1", "0"],
-    ["1", "1", "0", "0", "0"],
-    ["0", "0", "0", "0", "0"],
-  ]),
-);
-
-console.log(
-  outer([
-    ["1", "1", "0", "0", "0"],
-    ["1", "1", "0", "0", "0"],
-    ["0", "0", "1", "0", "0"],
-    ["0", "0", "0", "1", "1"],
-  ]),
+  IntersectionList(
+    [
+      [1, 3],
+      [5, 9],
+    ],
+    [],
+  ),
 );
